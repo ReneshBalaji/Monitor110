@@ -1,120 +1,114 @@
 import type { RedditPostItem } from "./explore-types";
 
-const REDDIT_JSON = "https://www.reddit.com";
-
-interface ListingChild {
-  data?: {
-    id?: string;
-    title?: string;
-    subreddit?: string;
-    author?: string;
-    selftext?: string;
-    created_utc?: number;
-    score?: number;
-    num_comments?: number;
-    permalink?: string;
-    url?: string;
-  };
-}
-
-interface CommentChild {
-  data?: {
-    body?: string;
-    author?: string;
-    score?: number;
-  };
-}
-
+/**
+ * Fetches trending (hot) posts via the server-side API route.
+ * The API route handles retries, rate limiting, and proper User-Agent headers.
+ */
 export async function fetchTrendingPosts(
   subreddit: string,
   limit: number = 20
 ): Promise<RedditPostItem[]> {
   const res = await fetch(
-    `${REDDIT_JSON}/r/${subreddit}/hot.json?limit=${limit}`,
-    { headers: { Accept: "application/json" } }
+    `/api/reddit?subreddit=${encodeURIComponent(subreddit)}&type=hot&limit=${limit}&comments=true`
   );
-  if (!res.ok) throw new Error("Failed to fetch from Reddit");
-  const json: { data?: { children?: ListingChild[] } } = await res.json();
-  const children = json?.data?.children ?? [];
-  const posts: RedditPostItem[] = [];
-
-  for (const child of children.slice(0, 15)) {
-    const d = child?.data;
-    if (!d?.id || !d.title) continue;
-
-    let comments: { body: string; author: string; score: number }[] = [];
-    try {
-      const commentRes = await fetch(
-        `${REDDIT_JSON}/r/${subreddit}/comments/${d.id}.json?limit=8`,
-        { headers: { Accept: "application/json" } }
-      );
-      if (commentRes.ok) {
-        const commentJson = await commentRes.json();
-        const commentList = commentJson?.[1]?.data?.children ?? [];
-        comments = commentList
-          .filter((c: CommentChild) => c?.data?.body)
-          .slice(0, 6)
-          .map((c: CommentChild) => ({
-            body: c.data?.body ?? "",
-            author: c.data?.author ?? "[deleted]",
-            score: c.data?.score ?? 0,
-          }));
-      }
-    } catch {
-      // skip comments on failure
-    }
-
-    posts.push({
-      id: `reddit-${d.id}`,
-      title: d.title,
-      subreddit: d.subreddit ?? subreddit,
-      author: d.author ?? "[deleted]",
-      selftext: d.selftext ?? "",
-      created_utc: d.created_utc ?? 0,
-      score: d.score ?? 0,
-      num_comments: d.num_comments ?? 0,
-      permalink: d.permalink ? `https://www.reddit.com${d.permalink}` : "",
-      url: d.url ?? "",
-      comments,
-      source: "reddit",
-    });
+  
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Failed to fetch: ${res.status}`);
   }
-
-  return posts;
+  
+  const data = await res.json();
+  return data.posts ?? [];
 }
 
-/** Fetches recent posts (new.json) for time-window spike comparison. No comments. */
+/**
+ * Fetches recent posts (new) for time-window spike comparison.
+ * No comments fetched for performance.
+ */
 export async function fetchRecentPosts(
   subreddit: string,
   limit: number = 100
 ): Promise<RedditPostItem[]> {
   const res = await fetch(
-    `${REDDIT_JSON}/r/${subreddit}/new.json?limit=${limit}`,
-    { headers: { Accept: "application/json" } }
+    `/api/reddit?subreddit=${encodeURIComponent(subreddit)}&type=new&limit=${limit}&comments=false`
   );
-  if (!res.ok) throw new Error("Failed to fetch from Reddit");
-  const json: { data?: { children?: ListingChild[] } } = await res.json();
-  const children = json?.data?.children ?? [];
-  const posts: RedditPostItem[] = [];
-
-  for (const child of children) {
-    const d = child?.data;
-    if (!d?.id || !d.title) continue;
-    posts.push({
-      id: `reddit-${d.id}`,
-      title: d.title,
-      subreddit: d.subreddit ?? subreddit,
-      author: d.author ?? "[deleted]",
-      selftext: d.selftext ?? "",
-      created_utc: d.created_utc ?? 0,
-      score: d.score ?? 0,
-      num_comments: d.num_comments ?? 0,
-      permalink: d.permalink ? `https://www.reddit.com${d.permalink}` : "",
-      url: d.url ?? "",
-      comments: [],
-      source: "reddit",
-    });
+  
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Failed to fetch: ${res.status}`);
   }
+  
+  const data = await res.json();
+  return data.posts ?? [];
+}
 
-  return posts;
+/**
+ * Fetches news from multiple sources (RSS feeds, news APIs)
+ */
+export async function fetchNewsFromSources(
+  coinId: string,
+  limit: number = 15
+): Promise<RedditPostItem[]> {
+  try {
+    const res = await fetch(
+      `/api/news?coin=${encodeURIComponent(coinId)}&limit=${limit}`
+    );
+    
+    if (!res.ok) {
+      console.warn("News fetch failed, continuing with Reddit only");
+      return [];
+    }
+    
+    const data = await res.json();
+    return data.posts ?? [];
+  } catch {
+    // News is optional, don't fail the whole request
+    return [];
+  }
+}
+
+/**
+ * Fetches tweets from Twitter/X API (if configured)
+ */
+export async function fetchTwitterPosts(
+  coinId: string,
+  limit: number = 10
+): Promise<RedditPostItem[]> {
+  try {
+    const res = await fetch(
+      `/api/twitter?coin=${encodeURIComponent(coinId)}&limit=${limit}`
+    );
+    
+    if (!res.ok) {
+      return [];
+    }
+    
+    const data = await res.json();
+    return data.posts ?? [];
+  } catch {
+    // Twitter is optional
+    return [];
+  }
+}
+
+/**
+ * Fetches from all sources: Reddit + News + Twitter
+ * Combines and deduplicates results
+ */
+export async function fetchAllSources(
+  subreddit: string,
+  coinId: string,
+  limit: number = 25
+): Promise<RedditPostItem[]> {
+  const [redditPosts, newsPosts, twitterPosts] = await Promise.all([
+    fetchTrendingPosts(subreddit, limit),
+    fetchNewsFromSources(coinId, limit),
+    fetchTwitterPosts(coinId, 10),
+  ]);
+  
+  // Combine all sources
+  const all = [...redditPosts, ...newsPosts, ...twitterPosts];
+  
+  // Sort by date (newest first)
+  return all.sort((a, b) => b.created_utc - a.created_utc);
 }

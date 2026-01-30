@@ -1,6 +1,6 @@
 export type CoinId = "bitcoin" | "ethereum" | "solana" | "cardano" | "xrp";
 
-export type FeedSource = "reddit" | "news";
+export type FeedSource = "reddit" | "news" | "twitter";
 
 export interface RedditPostItem {
   id: string;

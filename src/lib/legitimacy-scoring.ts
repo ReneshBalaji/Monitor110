@@ -1,11 +1,11 @@
 import type { RedditPostItem, KeywordSpike, ScoredPost, SpikeSentiment, TimeWindow } from "./explore-types";
 
 const CRYPTO_KEYWORDS: Record<string, string[]> = {
-  bitcoin: ["etf", "btc", "halving", "mining", "regulation", "sec", "exchange", "hack", "adoption", "institutional", "whale", "custody"],
-  ethereum: ["eth", "etf", "merge", "staking", "defi", "layer 2", "l2", "regulation", "sec", "gas", "upgrade"],
-  solana: ["sol", "etf", "pump", "meme", "airdrop", "nft", "defi", "outage", "speed"],
-  cardano: ["ada", "etf", "staking", "governance", "upgrade", "defi"],
-  xrp: ["xrp", "ripple", "sec", "lawsuit", "regulation", "etf"],
+  bitcoin: ["halving", "spot etf", "blackrock", "grayscale", "microstrategy", "saylor", "lightning network", "ordinals", "inscriptions", "runes", "treasury", "strategic reserve", "nation state", "el salvador", "mining ban", "hash rate", "difficulty adjustment", "mempool", "fees spike", "whale alert", "mt gox", "silk road", "seizure", "etf approval", "etf inflows", "etf outflows"],
+  ethereum: ["dencun", "proto-danksharding", "blob", "pectra", "verkle", "eigenlayer", "restaking", "lido", "rocketpool", "liquid staking", "layer 2", "arbitrum", "optimism", "base", "zksync", "starknet", "vitalik", "foundation", "gas spike", "blob fees", "etf approval", "spot etf", "staking yield", "beacon chain", "validators"],
+  solana: ["firedancer", "jump crypto", "breakpoint", "saga phone", "blinks", "actions", "jupiter", "jito", "marinade", "sanctum", "tensor", "magic eden", "phantom", "solflare", "outage", "congestion", "priority fees", "meme coin", "pump.fun", "bonk", "dogwifhat", "helium migration", "drip", "compressed nft"],
+  cardano: ["voltaire", "chang hard fork", "governance", "catalyst", "drep", "constitutional committee", "midnight", "hydra", "mithril", "partner chains", "iohk", "emurgo", "cardano foundation", "hoskinson", "plutus v3", "marlowe", "djed", "snek", "minswap", "sundaeswap", "jpg store"],
+  xrp: ["ripple lawsuit", "sec appeal", "garlinghouse", "larsen", "hinman", "xls-30", "amm", "hooks", "sidechain", "evm compatible", "cbdc", "cross-border", "on-demand liquidity", "santander", "sbi", "programmatic sales", "secondary market", "stablecoin", "rlusd"],
 };
 
 export const STOCKS_KEYWORDS: string[] = [
@@ -163,7 +163,7 @@ function cleanSnippet(text: string, maxLen: number = 140): string {
 function getCoOccurringKeywords(
   keyword: string,
   posts: RedditPostItem[],
-  coinId: string,
+  _coinId: string,
   keywords: string[]
 ): string[] {
   const postsWithKw = posts.filter((p) => {
@@ -188,30 +188,24 @@ function getCoOccurringKeywords(
     .map(([k]) => k);
 }
 
-/** Build a narrative that explains *why* this term is trending (context + co-occurrence + sentiment). */
+/** Build a concise reason why this term is trending. */
 function buildExpandableSummary(
-  keyword: string,
+  _keyword: string,
   spikePercent: number,
   coOccurring: string[],
   feedbackSummary: string,
-  sentiment: SpikeSentiment
+  _sentiment: SpikeSentiment
 ): string {
-  const kw = keyword.charAt(0).toUpperCase() + keyword.slice(1);
-  const reason =
-    coOccurring.length > 0
-      ? `It’s coming up in discussions alongside ${coOccurring.map((k) => k.charAt(0).toUpperCase() + k.slice(1)).join(", ")}, so people are connecting it to those topics.`
-      : `Mentions are up ${spikePercent}% compared to other topics in this window, so it’s getting more attention than usual.`;
-  const sentimentLine =
-    sentiment === "positive"
-      ? "Sentiment in those discussions is mostly positive."
-      : sentiment === "mixed"
-      ? "Sentiment is mixed or cautious."
-      : "Sentiment is mostly neutral.";
-  const hasFeedback = feedbackSummary && feedbackSummary !== "No summary available.";
-  const exampleLine = hasFeedback
-    ? `Example from discussion: "${cleanSnippet(feedbackSummary, 100)}"`
-    : "";
-  return `${kw} is trending because ${reason} ${sentimentLine}${exampleLine ? ` ${exampleLine}` : ""}`;
+  // Show the discussion snippet as the reason
+  if (feedbackSummary && feedbackSummary !== "No summary available.") {
+    return `"${cleanSnippet(feedbackSummary, 140)}"`;
+  }
+  // If we have co-occurring keywords, mention them
+  if (coOccurring.length > 0) {
+    return `Discussed with ${coOccurring.map((k) => k.charAt(0).toUpperCase() + k.slice(1)).join(", ")}`;
+  }
+  // Fallback
+  return `+${spikePercent}% mentions`;
 }
 
 /** Ignore keywords that appear in almost all posts (common / always-present). */

@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   fetchTrendingPosts,
   fetchRecentPosts,
+  fetchAllSources,
 } from "@/lib/reddit-fetch";
 import {
   scoreAndSort,
@@ -72,16 +73,17 @@ function SentimentTag({ sentiment }: { sentiment?: "positive" | "mixed" | "neutr
   );
 }
 
-function SourceBadge({ source }: { source?: "reddit" | "news" }) {
+function SourceBadge({ source }: { source?: "reddit" | "news" | "twitter" }) {
   const s = source ?? "reddit";
-  const styles = {
+  const styles: Record<string, string> = {
     reddit: "bg-orange-500/20 text-orange-400",
     news: "bg-sky-500/20 text-sky-400",
+    twitter: "bg-blue-500/20 text-blue-400",
   };
-  const labels = { reddit: "Reddit", news: "News" };
+  const labels: Record<string, string> = { reddit: "Reddit", news: "News", twitter: "Twitter/X" };
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${styles[s]}`}>
-      {labels[s]}
+    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${styles[s] || styles.news}`}>
+      {labels[s] || "News"}
     </span>
   );
 }
@@ -92,7 +94,7 @@ export default function ExploreCryptoPage() {
   const [error, setError] = useState<string | null>(null);
   const [scoredPosts, setScoredPosts] = useState<ScoredPost[] | null>(null);
   const [spikes, setSpikes] = useState<KeywordSpike[] | null>(null);
-  const [timeWindow, setTimeWindow] = useState<TimeWindow>("24h");
+  const [timeWindow, setTimeWindow] = useState<TimeWindow>("1h");
   const [spikesByWindow, setSpikesByWindow] = useState<Record<TimeWindow, KeywordSpike[]> | null>(null);
   const [recentPosts, setRecentPosts] = useState<RedditPostItem[] | null>(null);
   const [keyPoints, setKeyPoints] = useState<string[] | null>(null);
@@ -119,15 +121,16 @@ export default function ExploreCryptoPage() {
     setKeyPoints(null);
     setShowAllNews(false);
     try {
-      const [hotPosts, recent] = await Promise.all([
-        fetchTrendingPosts(currentCoin.subreddit, 18),
+      // Fetch from all sources: Reddit + News (CoinDesk, Decrypt, Cointelegraph, etc.)
+      const [allPosts, recent] = await Promise.all([
+        fetchAllSources(currentCoin.subreddit, coin, 25),
         fetchRecentPosts(currentCoin.subreddit, 100),
       ]);
-      if (!hotPosts.length) throw new Error("No posts returned from Reddit");
+      if (!allPosts.length) throw new Error("No posts returned from any source");
 
-      const scored = scoreAndSort(hotPosts, coin);
-      const mainSpikes = computeKeywordSpikes(hotPosts, coin);
-      const summaryBullets = generateKeyPointsSummary(hotPosts, coin);
+      const scored = scoreAndSort(allPosts, coin);
+      const mainSpikes = computeKeywordSpikes(allPosts, coin);
+      const summaryBullets = generateKeyPointsSummary(allPosts, coin);
 
       setScoredPosts(scored);
       setSpikes(mainSpikes);
@@ -190,7 +193,7 @@ export default function ExploreCryptoPage() {
             disabled={loading}
             className="rounded-lg bg-violet-600 px-6 py-3 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50 disabled:pointer-events-none transition-colors"
           >
-            {loading ? "Fetching & scoring…" : "Fetch trending news"}
+            {loading ? "Fetching from all sources…" : "Fetch from Reddit + News"}
           </button>
         </div>
 
@@ -300,7 +303,7 @@ export default function ExploreCryptoPage() {
             <section className="animate-fade-in-up" style={{ animationDelay: "100ms" }}>
               <h2 className="text-lg font-semibold text-white mb-2">News</h2>
               <p className="text-sm text-white/60 mb-4">
-                Sorted by discussion quality and consistency, not hype or upvotes. From Reddit.
+                Sorted by legitimacy. Sources: Reddit, Twitter/X, CoinDesk, Decrypt, Cointelegraph.
               </p>
               <ul className="space-y-4">
                 {visiblePosts.map((item) => {
