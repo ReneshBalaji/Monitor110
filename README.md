@@ -1,18 +1,18 @@
-# Portfolio Intelligence — Frontend
+# Monitor110
 
-Landing → **Get Started** → **Categories** (Crypto, Stocks, Real Estate) → per-category explore with Reddit trending news, legitimacy scoring, and spike summaries.
+Portfolio Intelligence is an online application that analyzes the discussion of crypto assets on Reddit and provides a ranking of posts based on the quality and authenticity of the discussion.
 
 ## Flow
 
 1. **Landing** (`/`) — Hero and a **Get Started** button.
 2. **Categories** (`/categories`) — Three sections: **Crypto**, **Stocks**, **Real Estate**. Click **Crypto** to continue.
 3. **Explore Crypto** (`/explore/crypto`) — Select a coin (Bitcoin, Ethereum, Solana, Cardano, XRP), click **Fetch trending news**:
-   - Fetches hot Reddit posts from that coin’s subreddit and top comments.
+   - Fetches hot Reddit posts from that coin's subreddit and top comments.
    - **Legitimacy scoring** (classification / anomaly-style logic): keywords, comment sentiment, engagement, diversity, consistency. Higher score = more viable.
    - **Keyword spikes** (header): for each trending keyword — **Keyword**, **Spike %**, **Feedback (from comments)** summary.
    - Results **sorted by legitimacy** (descending). Each card: title, subreddit, author, date, viability summary, legitimacy score, **Open on Reddit** link.
 
-Stocks and Real Estate are placeholders (“Coming soon”).
+Stocks and Real Estate are placeholders ("Coming soon").
 
 ## Run locally
 
