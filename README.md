@@ -131,21 +131,12 @@ npm run build
 
 ---
 
-## Screenshots to take
 
-Use these for docs or marketing. Capture at **1920×1080 or 1440×900** with browser zoom at 100%.
+<img width="1918" height="1012" alt="Group 1" src="https://github.com/user-attachments/assets/65a9fdf8-52d6-4fe3-8927-ff348721dc9a" />
+<img width="1918" height="1012" alt="Group 1 (1)" src="https://github.com/user-attachments/assets/4cf3301c-8979-4ebf-98ee-be0f7fa77ba4" />
+<img width="1919" height="1012" alt="Group 1 (2)" src="https://github.com/user-attachments/assets/7ef51c35-65af-4c83-aa4c-c01b23f6aa5e" />
+<img width="1893" height="1006" alt="image" src="https://github.com/user-attachments/assets/7185ea6a-8884-4836-9bbc-86e2e9d1a618" />
 
-| # | Page | What to capture |
-|---|------|-----------------|
-<img width="1918" height="1012" alt="image" src="https://github.com/user-attachments/assets/a4194bd1-7d91-4cc3-b305-5fcb06907dc5" />
-| 2 | Categories (`/categories`) | All three cards: Crypto, Stocks, Real Estate with descriptions. |
-| 3 | Explore Crypto (`/explore/crypto`) | Before fetch: coin selector, Coingecko market card, "Fetch trending news" button. |
-| 4 | Explore Crypto | After fetch: Key points, Keyword spikes (with time-window buttons), first few News cards (Community/Article, legitimacy score, "Open from source"). |
-| 5 | Explore Crypto | One keyword spike card expanded: "Why trending" open with bullet points (spike %, related topics, sentiment, sample). |
-| 6 | Explore Crypto | Legitimacy modal open: "How legitimacy is calculated" text and "Not financial advice" disclaimer. |
-| 7 | Explore Stocks (`/explore/stocks`) | After fetch: spikes + news list. |
-| 8 | Explore Real Estate (`/explore/real-estate`) | After fetch: spikes + news list. |
-| 9 | About (`/about`) | Architecture section (Data source, Processing, Storage, Output) and Ethics list. |
 
 ---
 
