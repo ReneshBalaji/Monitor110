@@ -137,7 +137,7 @@ Use these for docs or marketing. Capture at **1920×1080 or 1440×900** with bro
 
 | # | Page | What to capture |
 |---|------|-----------------|
-| 1 | Landing (`/`) | Full hero: title, subtitle, "Get Started" button. |
+<img width="1918" height="1012" alt="image" src="https://github.com/user-attachments/assets/a4194bd1-7d91-4cc3-b305-5fcb06907dc5" />
 | 2 | Categories (`/categories`) | All three cards: Crypto, Stocks, Real Estate with descriptions. |
 | 3 | Explore Crypto (`/explore/crypto`) | Before fetch: coin selector, Coingecko market card, "Fetch trending news" button. |
 | 4 | Explore Crypto | After fetch: Key points, Keyword spikes (with time-window buttons), first few News cards (Community/Article, legitimacy score, "Open from source"). |
