@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --muted: #64748b;
+  --primary: #2563eb;
+  --primary-light: #3b82f6;
+  --positive: #0d9488;
+  --negative: #dc2626;
+  --neutral: #64748b;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Hero gradient + grid */
+.hero-gradient {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 50%, #eff6ff 85%, #dbeafe 100%);
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(to right, rgb(219 234 254 / 0.4) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(219 234 254 / 0.4) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Trending spikes horizontal scroll — light theme */
+.spike-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(147 197 253) rgb(239 246 255);
+  mask-image: linear-gradient(to right, black 0, black calc(100% - 32px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 32px), transparent 100%);
+}
+
+.spike-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.spike-scroll::-webkit-scrollbar-track {
+  background: rgb(241 245 249);
+  border-radius: 4px;
+}
+
+.spike-scroll::-webkit-scrollbar-thumb {
+  background: rgb(147 197 253);
+  border-radius: 4px;
+}
+
+.spike-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgb(96 165 250);
+}
+
+/* Animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(20px, -20px) scale(1.05);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animation-delay-100 { animation-delay: 100ms; }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 10s ease-in-out infinite 2s;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s ease-in-out infinite;
+}
