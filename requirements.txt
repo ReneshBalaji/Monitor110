@@ -1,9 +1,0 @@
-fastapi
-uvicorn
-sqlalchemy
-psycopg2-binary
-pydantic
-sentence-transformers
-faiss-cpu
-numpy
-scikit-learn
