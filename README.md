@@ -90,19 +90,6 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-### Optional: articles for crypto
-
-To include CryptoPanic articles on the crypto explore page:
-
-1. Get a free API key from [CryptoPanic Developers](https://cryptopanic.com/developers).
-2. In the `frontend` directory create or edit `.env.local`:
-   ```env
-   NEXT_PUBLIC_CRYPTOPANIC_API_KEY=your_key_here
-   ```
-3. Restart `npm run dev`. The crypto page will merge community + articles.
-
----
-
 ## Testing and verification
 
 ### Smoke test (happy path)
