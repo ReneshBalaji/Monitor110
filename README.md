@@ -104,7 +104,6 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Edge cases
 
-- **No API key** — CryptoPanic key unset: crypto page still works with community feed only; no errors.
 - **Empty window** — Select a very short time window (e.g. Current) after fetch; if that window has no posts, news list may be empty and spikes may fall back to main spikes.
 - **Source failure** — If community fetch fails, error message is shown; no crash.
 
@@ -127,15 +126,7 @@ npm run build
 
 ---
 
-## Environment variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NEXT_PUBLIC_CRYPTOPANIC_API_KEY` | No | CryptoPanic API key for crypto articles. If unset, crypto page uses community feed only. Add in `frontend/.env.local`. |
-
-No other env vars are required for run or build.
-
----
 
 ## Project structure
 
